@@ -44,6 +44,9 @@ public class RegEx {
       try {
         RegExTree ret = parse();
         System.out.println("  >> Tree result: "+ret.toString()+".");
+        System.out.println("  >> NFA \n");
+        NFA nfa = new NFA().fromRegExTree(ret); 
+        System.out.println(nfa);
       } catch (Exception e) {
         System.err.println("  >> ERROR: syntax error for regEx \""+regEx+"\".");
       }
@@ -52,6 +55,8 @@ public class RegEx {
     System.out.println("  >> ...");
     System.out.println("  >> Parsing completed.");
     System.out.println("Goodbye Mr. Anderson.");
+ 
+    
   }
 
   //FROM REGEX TO SYNTAX TREE
