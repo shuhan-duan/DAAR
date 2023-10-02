@@ -1,4 +1,4 @@
-package regEx.src.regEx;
+package regEx;
 
 public class Pair {
     private final int startIndex;

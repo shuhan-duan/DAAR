@@ -1,4 +1,4 @@
-package regEx.src.regEx;
+package regEx;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,6 @@ public class Main {
         String[] lines = text.split("\\n");
 
         String expression = "S(a|r|g)*on";
-        //String expression = "aabc";
 
         SyntaxTreeNode root = SyntaxTreeBuilder.buildSyntaxTree(expression);
         NFA nfa = NFABuilder.syntaxTreeToNFA(root);

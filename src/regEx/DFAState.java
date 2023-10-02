@@ -1,4 +1,4 @@
-package regEx.src.regEx;
+package regEx;
 
 import java.util.HashMap;
 import java.util.Map;

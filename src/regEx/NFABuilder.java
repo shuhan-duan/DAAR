@@ -1,4 +1,4 @@
-package regEx.src.regEx;
+package regEx;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -113,7 +113,7 @@ public class NFABuilder {
                 char symbolChar = (char) symbol;
 
                 if (symbol == NFA.EPSILON)
-                    symbolChar = 'ε';
+                    symbolChar = 'E';
 
                 if (symbol == SyntaxTreeBuilder.DOT)
                     symbolChar = '.';

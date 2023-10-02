@@ -1,4 +1,4 @@
-package regEx.src.regEx;
+package regEx;
 
 public class SyntaxTreeNode {
     int operation; // Operator or character
