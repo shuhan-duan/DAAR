@@ -1,4 +1,4 @@
-package regEx;
+package regEx.src.regEx;
 
 import java.util.Arrays;
 

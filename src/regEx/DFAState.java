@@ -1,75 +1,68 @@
-package regEx;
+package regEx.src.regEx;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class DFAState {
-	private static int stateCounter = 0;
-	
-	private int id;
-    private Set<NFAState> nfaStates;  
-    private boolean isFinal;
-    private Map<String, DFAState> transitions;
-	
-	public DFAState(Set<NFAState> nfaStates) {
-		this.id = stateCounter++;
-        this.nfaStates = nfaStates;
-        this.transitions = new HashMap<>();		
-	}
-	
-	public boolean isFinal() {
-        return isFinal;
+    private final int id;
+    private final Map<Integer, DFAState> transitions;
+    private boolean isStart;
+    private boolean isAccept;
+    public DFAState(int id, boolean isStart, boolean isAccept) {
+        this.id = id;
+        this.isStart = isStart;
+        this.isAccept = isAccept;
+        this.transitions = new HashMap<>();
     }
 
-    public void setFinal(boolean isFinal) {
-        this.isFinal = isFinal;
-    }
-    
-    public Map<String, DFAState> getTransitions() {
-        return transitions;
-    }
-
-    public void addTransition(String symbol, DFAState destination) {
-        this.transitions.put(symbol, destination);
-    }
-
-    public DFAState getTransition(String symbol) {
-        return this.transitions.get(symbol);
-    }
-    
     public int getId() {
         return id;
     }
 
-    public Set<NFAState> getNfaStates() {
-        return nfaStates;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        DFAState dfaState = (DFAState) obj;
-        return nfaStates.equals(dfaState.nfaStates);
+    public boolean isStart() {
+        return isStart;
     }
 
-    @Override
-    public int hashCode() {
-        return nfaStates.hashCode();
+    public void setStart() {
+        isStart = true;
     }
-    
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append("DFAState ").append(id).append(isFinal ? " (Final)" : "").append(":\n");
 
-        for (Map.Entry<String, DFAState> entry : transitions.entrySet()) {
-            String symbol = entry.getKey();
-            DFAState destination = entry.getValue();
-            result.append("\t").append(symbol).append(" -> DFAState ").append(destination.getId()).append("\n");
+    public boolean isAccept() {
+        return isAccept;
+    }
+
+    public void setAccept() {
+        isAccept = true;
+    }
+
+    public void addTransition(int symbol, DFAState nextState) {
+        transitions.put(symbol, nextState);
+    }
+
+    public void removeAllTransition() {
+        transitions.clear();
+    }
+
+    public DFAState getTransitions(int symbol) {
+        return transitions.get(symbol);
+    }
+
+    public Map<Integer, DFAState> getTransitions() {
+        return transitions;
+    }
+
+    public int getTransitionsHashCode() {
+        int hashCode = 0;
+
+        for (Map.Entry<Integer, DFAState> entry : transitions.entrySet()) {
+            int symbol = entry.getKey();
+            DFAState targetState = entry.getValue();
+
+            // include the symbol and target state IDs in the hash code
+            hashCode = hashCode * 31 + symbol;
+            hashCode = hashCode * 31 + targetState.getId();
         }
 
-        return result.toString();
+        return hashCode;
     }
 }
