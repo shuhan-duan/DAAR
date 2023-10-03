@@ -60,12 +60,36 @@ public class Main {
     }
 
     public static boolean isSimpleConcatenation(String regex) {
+        char[] specialChars = { '*', '|' };
 
-        regex = regex.trim().replaceAll("^[^\\w]+|[^\\w]+$", "");
-        String[] parts = regex.split("[^\\w]+");
+        for (int i = 0; i < regex.length(); i++) {
+            char c = regex.charAt(i);
 
-        return parts.length == 1 && parts[0].equals(regex);
+            if (c == '.' && (i == 0 || Character.isLetterOrDigit(regex.charAt(i - 1))) && 
+                (i == regex.length() - 1 || Character.isLetterOrDigit(regex.charAt(i + 1)))) {
+                continue; // Likely a period in a sentence, not a regex dot.
+            }
+
+            if (indexOf(specialChars, c) != -1) {
+                if (i == 0 || regex.charAt(i - 1) != '\\' || (i >= 2 && regex.charAt(i - 2) == '\\')) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
+
+
+    private static int indexOf(char[] array, char c) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     public static void printResult(List<Pair> matches, String line) {
         if (!matches.isEmpty()) {
@@ -101,7 +125,7 @@ public class Main {
         File file;
 
 
-        regEx = "S(a|r|g)*on";
+        regEx = "Sarg*on";
         filename = "56667-0.txt";
         System.out.println("RegEx : \"" + regEx + "\"");
         System.out.println("filename : " + filename);
