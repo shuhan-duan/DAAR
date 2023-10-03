@@ -59,53 +59,83 @@ public class Main {
         return data;
     }
 
+    public static boolean isSimpleConcatenation(String regex) {
+
+        regex = regex.trim().replaceAll("^[^\\w]+|[^\\w]+$", "");
+        String[] parts = regex.split("[^\\w]+");
+
+        return parts.length == 1 && parts[0].equals(regex);
+    }
+
+    public static void printResult(List<Pair> matches, String line) {
+        if (!matches.isEmpty()) {
+            StringBuilder highlightedLine = new StringBuilder();
+            int currentIndex = 0;
+            for (Pair couple : matches) {
+                // Append text before the match
+                if (couple.getStartIndex() > currentIndex) {
+                    highlightedLine.append(line, currentIndex, couple.getStartIndex());
+                }
+
+                // Append the matched text in red
+                String matchedText = line.substring(couple.getStartIndex(), couple.getEndIndex() + 1);
+                highlightedLine.append("\u001B[31m"); // ANSI escape code for red text
+                highlightedLine.append(matchedText);
+                highlightedLine.append("\u001B[0m"); // Reset color
+
+                currentIndex = couple.getEndIndex() + 1;
+            }
+            // Append any remaining text after the last match
+            if (currentIndex < line.length()) {
+                highlightedLine.append(line.substring(currentIndex));
+            }
+
+            // Print the line with highlighted matches
+            System.out.println(highlightedLine.toString());
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 
-        File file = new File("56667-0.txt");
+        String regEx, filename;
+        File file;
+
+
+        regEx = "S(a|r|g)*on";
+        filename = "56667-0.txt";
+        System.out.println("RegEx : \"" + regEx + "\"");
+        System.out.println("filename : " + filename);
+
+        file = new File(filename);
+
         String text = readText(file);
         String[] lines = text.split("\\n");
 
-        String expression = "S(a|r|g)*on";
-
-        SyntaxTreeNode root = SyntaxTreeBuilder.buildSyntaxTree(expression);
-        NFA nfa = NFABuilder.syntaxTreeToNFA(root);
-        //System.out.println(NFABuilder.generateDOT(nfa));
-        DFA dfa = DFABuilder.NFAToDFA(nfa);
-        //System.out.println(DFABuilder.generateDOT(dfa));
-        DFA minDfa = DFABuilder.minimizeDFA(dfa);
-        //System.out.println(DFABuilder.generateDOT(minDfa));
-
-        /////////////////TEST
         long startTime = System.currentTimeMillis();
 
-        for (String line : lines) {
-            List<Pair> matches = search(minDfa, line);
-            if (!matches.isEmpty()) {
-                StringBuilder highlightedLine = new StringBuilder();
-                int currentIndex = 0;
-                for (Pair couple : matches) {
-                    // Append text before the match
-                    if (couple.getStartIndex() > currentIndex) {
-                        highlightedLine.append(line, currentIndex, couple.getStartIndex());
-                    }
+        boolean simpleConcat = isSimpleConcatenation(regEx);
 
-                    // Append the matched text in red
-                    String matchedText = line.substring(couple.getStartIndex(), couple.getEndIndex() + 1);
-                    highlightedLine.append("\u001B[31m"); // ANSI escape code for red text
-                    highlightedLine.append(matchedText);
-                    highlightedLine.append("\u001B[0m"); // Reset color
-
-                    currentIndex = couple.getEndIndex() + 1;
-                }
-                // Append any remaining text after the last match
-                if (currentIndex < line.length()) {
-                    highlightedLine.append(line.substring(currentIndex));
-                }
-
-                // Print the line with highlighted matches
-                System.out.println(highlightedLine.toString());
+        if (simpleConcat) {
+            System.out.println("KMP");
+            KMP kmp = new KMP(regEx);
+            for (String line : lines) {
+                List<Pair> matches = kmp.search(line);
+                printResult(matches, line);
             }
 
+        } else {
+            System.out.println("automaton");
+            SyntaxTreeNode root = SyntaxTreeBuilder.buildSyntaxTree(regEx);
+            NFA nfa = NFABuilder.syntaxTreeToNFA(root);
+            //System.out.println(NFABuilder.generateDOT(nfa));
+            DFA dfa = DFABuilder.NFAToDFA(nfa);
+            //System.out.println(DFABuilder.generateDOT(dfa));
+            DFA minDfa = DFABuilder.minimizeDFA(dfa);
+            System.out.println(DFABuilder.generateDOT(minDfa));
+            for (String line : lines) {
+                List<Pair> matches = search(minDfa, line);
+                printResult(matches, line);
+            }
         }
 
         long searchEndTime = System.currentTimeMillis();

@@ -1,16 +1,18 @@
 package regEx;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class KMP {
-    private String pattern;
-    private int[] carryOver;
+    private final String pattern;
+    private final int[] carryOver;
 
     public KMP(String pattern) {
         this.pattern = pattern;
         this.carryOver = computeCarryOver();
     }
-    
+
     private int[] computeCarryOver() {
         int[] lps = initializeLPS();
         optimizeLPS(lps);
@@ -51,7 +53,10 @@ public class KMP {
         } while (changed);
     }
 
-    public int search(String text) {
+    public List<Pair> search(String text) {
+
+        List<Pair> matches = new ArrayList<>();
+
         int i = 0, j = 0;
 
         while (i < text.length()) {
@@ -60,7 +65,8 @@ public class KMP {
                 j++;
 
                 if (j == pattern.length()) {
-                    return i - j; // Match found at position i - j
+                    matches.add(new Pair(i - j, i - 1));
+                    j = 0;
                 }
             } else if (j != 0) {
                 j = carryOver[j];
@@ -74,19 +80,6 @@ public class KMP {
 
         }
 
-        return -1; // No match found
-    }
-
-    public static void main(String[] args) {
-    	String text ="maman mamé mia ! mm maaah !";
-        KMP kmp = new KMP("mamia");
-        int position = kmp.search(text);
-        System.out.println(Arrays.toString(kmp.computeCarryOver())); 
-        
-        if (position != -1) {
-            System.out.println("Pattern found at position: " + position);
-        } else {
-            System.out.println("Pattern not found in the text.");
-        }
+        return matches; // No match found
     }
 }
